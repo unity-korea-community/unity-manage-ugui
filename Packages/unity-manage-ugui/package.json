@@ -1,7 +1,7 @@
 {
-  "name": "com.unko.packagename",
+  "name": "com.unko.unity-manage-ugui",
   "version": "1.0.0",
-  "displayName": "UNKO packageName",
+  "displayName": "UNKO Manage UGUI",
   "description": "This is an example package",
   "unity": "2019.1",
   "author": {
@@ -9,10 +9,10 @@
     "url": "https://github.com/unity-korea-community"
   },
   "bugs": {
-    "url": "https://github.com/unity-korea-community/unity-package-template/issues"
+    "url": "https://github.com/unity-korea-community/unity-manage-ugui/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/unity-korea-community/unity-package-template.git"
+    "url": "https://github.com/unity-korea-community/unity-manage-ugui.git"
   }
 }
