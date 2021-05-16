@@ -1,6 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
     /// <summary>
     /// 캔버스의 상태
@@ -28,7 +28,7 @@ namespace Core
             return this;
         }
 
-        public void Awake(CanvasManager canvasManager)
+        public void Awake(ICanvasManager canvasManager)
         {
             canvasInstance.Init();
             status = CanvasStatus.Awake;

@@ -1,14 +1,14 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
     public interface ICanvas
     {
         string name { get; }
         Transform transform { get; }
         GameObject gameObject { get; }
-        CanvasManager canvasManager { get; set; }
+        ICanvasManager canvasManager { get; set; }
 
         void Init();
         IEnumerator OnShowCanvasCoroutine();

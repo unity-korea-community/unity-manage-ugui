@@ -1,12 +1,11 @@
 using System.Collections;
-using Core;
 using UnityEngine;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
     public class CanvasComponentBase : MonoBehaviour, ICanvas
     {
-        public CanvasManager canvasManager { get; set; }
+        public ICanvasManager canvasManager { get; set; }
 
         virtual public void Init() { }
 

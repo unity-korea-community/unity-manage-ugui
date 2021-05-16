@@ -1,10 +1,9 @@
 {
-    "name": "UISystemTests",
+    "name": "unko.unity-manage-ugui.runtime.tests",
     "rootNamespace": "",
     "references": [
-        "GUID:bc7c4ec23ee789d41b699da229aab0d3",
-        "GUID:e372c541aba5148868e12aa078ca7c20",
-        "GUID:8367a353d1461614a86d17cfc47e5448"
+        "unko.unity-utils.runtime",
+        "unko.unity-manage-ugui.runtime"
     ],
     "includePlatforms": [
         "Editor"

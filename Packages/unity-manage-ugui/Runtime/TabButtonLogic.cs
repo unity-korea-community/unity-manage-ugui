@@ -2,12 +2,10 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using CommonModule;
 using UnityEngine.UI;
-using UniRx;
 using UNKO.Utils;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
     public class TabButtonLogic<TEnum>
         where TEnum : struct, Enum
@@ -48,13 +46,7 @@ namespace Core
                 Debug.LogError($"AddObject - _tabLogic.ContainsKey({key})");
                 return this;
             }
-
-            button.OnClickAsObservable()
-                .Subscribe(_ =>
-                {
-                    ShowObject(key);
-                });
-
+            button.onClick.AddListener(() => ShowObject(key));
             _tabButton.Add(key, button);
             return this;
         }

@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using Core.AnimatedBarLogic;
+using UNKO.ManageUGUI.AnimatedBarLogic;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
     /// <summary>
     /// 체력바, 경험치바 등에 사용하는 애니메이션 바.

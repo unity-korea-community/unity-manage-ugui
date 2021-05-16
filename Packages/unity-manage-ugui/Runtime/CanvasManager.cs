@@ -1,13 +1,12 @@
-﻿using CommonModule;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UNKO.Utils;
 
-namespace Core
+namespace UNKO.ManageUGUI
 {
-    public interface CanvasManager
+    public interface ICanvasManager
     {
         string name { get; }
         Transform transform { get; }
@@ -19,7 +18,7 @@ namespace Core
         void Hide(ICanvas canvas);
     }
 
-    public class CanvasManager<TDerived, TCanvasName> : SingletonComponentBase<TDerived>, CanvasManager
+    public class CanvasManager<TDerived, TCanvasName> : SingletonComponentBase<TDerived>, ICanvasManager
         where TDerived : CanvasManager<TDerived, TCanvasName>
         where TCanvasName : struct, System.Enum
     {

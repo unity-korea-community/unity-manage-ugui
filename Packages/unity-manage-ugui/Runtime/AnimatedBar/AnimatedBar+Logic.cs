@@ -2,11 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UNKO.ManageUGUI.AnimatedBarLogic;
+using static UNKO.ManageUGUI.AnimatedBar;
 
-using static Core.AnimatedBar;
-using Core.AnimatedBarLogic;
-
-namespace Core
+namespace UNKO.ManageUGUI
 {
     public enum EAnimatedBarLogicName
     {
