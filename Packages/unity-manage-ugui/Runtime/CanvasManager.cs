@@ -14,6 +14,7 @@ namespace UNKO.ManageUGUI
 
         bool IsShow(string canvasName);
         ICanvas Show(string canvasName);
+        ICanvas Show(ICanvas canvas);
         void Hide(string canvasName);
         void Hide(ICanvas canvas);
     }
@@ -81,8 +82,34 @@ namespace UNKO.ManageUGUI
             {
                 canvasWrapper.SetActive(true);
                 StartCoroutine(canvasWrapper.OnShowCanvasCoroutine());
+                OnShowCanvas(canvasName, canvasWrapper.canvasInstance);
             }
-            OnShowCanvas(canvasName, canvasWrapper.canvasInstance);
+
+            return canvasWrapper.canvasInstance;
+        }
+
+        public ICanvas Show(ICanvas canvas)
+        {
+            if (_instanceMatch.TryGetValue(canvas, out var canvasWrapper) == false)
+            {
+                Debug.LogError($"CanvasManager({name}) not found canvasInstance:{canvas.gameObject.name}", this);
+                return canvas;
+            }
+
+            string canvasName = canvas.gameObject.name;
+            if (System.Enum.TryParse(canvasName, out TCanvasName canvasNameEnum) == false)
+            {
+                Debug.LogError($"{name} not found canvasInstance:{canvasName}", this);
+                return canvas;
+            }
+
+            if (canvasWrapper != null)
+            {
+                canvasWrapper.SetActive(true);
+                StartCoroutine(canvasWrapper.OnShowCanvasCoroutine());
+                OnShowCanvas(canvasNameEnum, canvasWrapper.canvasInstance);
+            }
+
             return canvasWrapper.canvasInstance;
         }
 
