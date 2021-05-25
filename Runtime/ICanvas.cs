@@ -23,6 +23,11 @@ namespace UNKO.ManageUGUI
             return canvas as T;
         }
 
+        public static void Show(this ICanvas canvas)
+        {
+            canvas.canvasManager.Show(canvas);
+        }
+
         public static void Hide(this ICanvas canvas)
         {
             canvas.canvasManager.Hide(canvas);
