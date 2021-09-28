@@ -1,6 +1,6 @@
 {
   "name": "com.unko.unity-manage-ugui",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "displayName": "UNKO Manage UGUI",
   "description": "This is an example package",
   "unity": "2019.1",
