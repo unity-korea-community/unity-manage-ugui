@@ -1,6 +1,6 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,8 +9,10 @@ namespace UNKO.ManageUGUI
     public interface IHasButton<TButtonName>
         where TButtonName : struct, Enum
     {
+#pragma warning disable IDE1006
         GameObject gameObject { get; }
         Dictionary<TButtonName, Button> buttons { get; }
+#pragma warning restore IDE1006
     }
 
     public static class IHasButtonExtension

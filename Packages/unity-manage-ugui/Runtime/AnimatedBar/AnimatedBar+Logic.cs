@@ -1,7 +1,7 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 using UNKO.ManageUGUI.AnimatedBarLogic;
 using static UNKO.ManageUGUI.AnimatedBar;
 
@@ -17,7 +17,7 @@ namespace UNKO.ManageUGUI
         /// <summary>
         /// 증가, 감소를 스무스하게 연출해주는 로직
         /// </summary>
-        AnimatedBarLogic_Shirink,
+        AnimatedBarLogic_Shrink,
     }
 
     public class AnimatedBarLogicFactory
@@ -26,11 +26,11 @@ namespace UNKO.ManageUGUI
 
         public IAnimatedBarLogic DoCreate_LibraryLogic(EDirection whenDirection, EAnimatedBarLogicName logicName, Image targetImage)
         {
-            IAnimatedBarLogic logic = null;
+            IAnimatedBarLogic logic;
             switch (logicName)
             {
                 case EAnimatedBarLogicName.AnimatedBarLogic_Blink_Image: logic = new AnimatedBarLogic_Blink_Image(); break;
-                case EAnimatedBarLogicName.AnimatedBarLogic_Shirink: logic = new AnimatedBarLogic_Shirink(); break;
+                case EAnimatedBarLogicName.AnimatedBarLogic_Shrink: logic = new AnimatedBarLogic_Shrink(); break;
 
                 default: Debug.LogError($"Not Found LogicName{logicName}"); return null;
             }
@@ -112,7 +112,7 @@ namespace UNKO.ManageUGUI
         }
 
         [System.Serializable]
-        public class AnimatedBarLogic_Shirink : IAnimatedBarLogic
+        public class AnimatedBarLogic_Shrink : IAnimatedBarLogic
         {
             public float duration = 1f;
 

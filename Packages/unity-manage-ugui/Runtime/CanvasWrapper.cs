@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using UnityEngine;
 
 namespace UNKO.ManageUGUI
 {
@@ -14,38 +16,43 @@ namespace UNKO.ManageUGUI
         Hide,
     }
 
-    public class CanvasWrapper
+    public class CanvasWrapper : IDisposable
     {
-        public CanvasStatus status { get; private set; } = CanvasStatus.NotInit;
-        public ICanvas canvasInstance { get; private set; }
+        public CanvasStatus Status { get; private set; } = CanvasStatus.NotInit;
+        public ICanvas CanvasInstance { get; private set; }
 
-        public bool isShow => status == CanvasStatus.Show;
+        public bool IsShow => Status == CanvasStatus.Show;
 
         public CanvasWrapper Init(ICanvas canvasInstance)
         {
-            this.canvasInstance = canvasInstance;
+            this.CanvasInstance = canvasInstance;
 
             return this;
         }
 
-        public void Awake(ICanvasManager canvasManager)
+        public void Awake()
         {
-            canvasInstance.Init();
-            status = CanvasStatus.Awake;
+            CanvasInstance.Init();
+            Status = CanvasStatus.Awake;
         }
 
         public void SetActive(bool active)
         {
-            canvasInstance.gameObject.SetActive(active);
-            status = active ? CanvasStatus.Show : CanvasStatus.Hide;
+            CanvasInstance.gameObject.SetActive(active);
+            Status = active ? CanvasStatus.Show : CanvasStatus.Hide;
         }
 
         public void SetStatus(CanvasStatus status)
         {
-            this.status = status;
+            this.Status = status;
         }
 
-        public IEnumerator OnShowCanvasCoroutine() => canvasInstance.OnShowCanvasCoroutine();
-        public IEnumerator OnHideCanvasCoroutine() => canvasInstance.OnHideCanvasCoroutine();
+        public IEnumerator OnShowCanvasCoroutine() => CanvasInstance.OnShowCanvasCoroutine();
+        public IEnumerator OnHideCanvasCoroutine() => CanvasInstance.OnHideCanvasCoroutine();
+
+        public void Dispose()
+        {
+            GameObject.DestroyImmediate(CanvasInstance.gameObject);
+        }
     }
 }
