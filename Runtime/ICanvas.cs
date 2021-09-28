@@ -5,10 +5,12 @@ namespace UNKO.ManageUGUI
 {
     public interface ICanvas
     {
+#pragma warning disable IDE1006
         string name { get; }
         Transform transform { get; }
         GameObject gameObject { get; }
         ICanvasManager canvasManager { get; set; }
+#pragma warning restore IDE1006
 
         void Init();
         IEnumerator OnShowCanvasCoroutine();
