@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UNKO.ManageUGUI;
 
 namespace UNKO.ManageUGUI
 {
@@ -16,23 +17,23 @@ namespace UNKO.ManageUGUI
         IEnumerator OnShowCanvasCoroutine();
         IEnumerator OnHideCanvasCoroutine();
     }
+}
 
-    public static class ICanvasHelper
+public static class ICanvasHelper
+{
+    public static T Cast<T>(this ICanvas canvas)
+        where T : class, ICanvas
     {
-        public static T Cast<T>(this ICanvas canvas)
-            where T : class, ICanvas
-        {
-            return canvas as T;
-        }
+        return canvas as T;
+    }
 
-        public static void Show(this ICanvas canvas)
-        {
-            canvas.canvasManager.Show(canvas);
-        }
+    public static void Show(this ICanvas canvas)
+    {
+        canvas.canvasManager.Show(canvas);
+    }
 
-        public static void Hide(this ICanvas canvas)
-        {
-            canvas.canvasManager.Hide(canvas);
-        }
+    public static void Hide(this ICanvas canvas)
+    {
+        canvas.canvasManager.Hide(canvas);
     }
 }
