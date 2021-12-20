@@ -1,6 +1,6 @@
-using System.Linq;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UNKO.Utils;
@@ -27,16 +27,16 @@ namespace UNKO.ManageUGUI
 
             _tabButton.Keys
                 .Where(item => item.Equals(key) == false)
-                .Foreach(item => HideObject(item));
+                .ForEach(item => HideObject(item));
 
-            _onShowLogic.Foreach(logic => logic(key));
-            _onShowObject.Foreach(logic => logic(key));
+            CollectionExtension.ForEach(_onShowLogic, logic => logic(key));
+            CollectionExtension.ForEach(_onShowObject, logic => logic(key));
         }
 
 
         public void HideObject(TEnum key)
         {
-            _onHideLogic.Foreach(logic => logic(key));
+            CollectionExtension.ForEach(_onHideLogic, logic => logic(key));
         }
 
         public TabButtonLogic<TEnum> AddObject(TEnum key, Button button)

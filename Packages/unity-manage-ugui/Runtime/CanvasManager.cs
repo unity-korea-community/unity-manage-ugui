@@ -25,11 +25,76 @@ namespace UNKO.ManageUGUI
         where TDerived : CanvasManager<TDerived, TCanvasName>
         where TCanvasName : struct, System.Enum
     {
+        public struct Command
+        {
+            public TCanvasName CanvasName { get; private set; }
+            public CanvasWrapper CanvasWrapper { get; private set; }
+            public bool IsShow { get; private set; }
+
+            public Command(TCanvasName canvasName, CanvasWrapper canvasWrapper, bool isShow)
+            {
+                CanvasName = canvasName;
+                CanvasWrapper = canvasWrapper;
+                IsShow = isShow;
+            }
+        }
+
         private Dictionary<TCanvasName, List<CanvasWrapper>> _canvasInstance = new Dictionary<TCanvasName, List<CanvasWrapper>>();
         private Dictionary<ICanvas, (TCanvasName name, CanvasWrapper wrapper)> _instanceMatch = new Dictionary<ICanvas, (TCanvasName, CanvasWrapper)>();
+        List<Command> _commandQueue = new List<Command>();
 
         private SimplePool<CanvasWrapper> _canvasWrapperPool = new SimplePool<CanvasWrapper>(new CanvasWrapper(), 10);
         public bool IsReady { get; private set; }
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            if (IsReady)
+            {
+                return;
+            }
+
+            ICanvas[] canvasArray = GetComponentsInChildren<ICanvas>(true);
+            foreach (var canvas in canvasArray)
+            {
+                if (System.Enum.TryParse(canvas.name, out TCanvasName canvasName))
+                    AddCanvasInstance(canvasName, canvas);
+            }
+            Init(false);
+
+            IsReady = true;
+        }
+
+        protected void Update()
+        {
+            while (_commandQueue.Count > 0)
+            {
+                Command command = _commandQueue.Dequeue();
+                TCanvasName canvasName = command.CanvasName;
+                CanvasWrapper canvasWrapper = command.CanvasWrapper;
+                if (canvasWrapper == null)
+                {
+                    Debug.LogError($"canvas wrapper is null: {canvasName}, isShow: {command.IsShow}");
+                    continue;
+                }
+                if (command.IsShow)
+                {
+                    canvasWrapper.SetActive(true);
+                    StartCoroutine(canvasWrapper.OnShowCanvasCoroutine());
+                    OnShowCanvas(canvasName, canvasWrapper.CanvasInstance);
+                }
+                else
+                {
+                    canvasWrapper.SetStatus(CanvasStatus.HideAnimationPlaying);
+                    OnHideCanvas(canvasName, canvasWrapper.CanvasInstance);
+                    StartCoroutine(canvasWrapper.OnHideCanvasCoroutine, () =>
+                    {
+                        canvasWrapper.SetActive(false);
+                    });
+                }
+            }
+        }
 
         public void Init(bool active)
         {
@@ -80,18 +145,22 @@ namespace UNKO.ManageUGUI
             if (canvasWrapper == null)
                 canvasWrapper = OnCreateInstance(canvasName);
 
-            if (canvasWrapper != null)
-            {
-                canvasWrapper.SetActive(true);
-                StartCoroutine(canvasWrapper.OnShowCanvasCoroutine());
-                OnShowCanvas(canvasName, canvasWrapper.CanvasInstance);
-            }
+            return ProcessShow(canvasName, canvasWrapper);
+        }
 
-            return canvasWrapper.CanvasInstance;
+        public void Show(params TCanvasName[] canvasNames)
+        {
+            canvasNames.ForEach((canvasName) => this.Show(canvasName));
         }
 
         public ICanvas Show(ICanvas canvas)
         {
+            if (canvas.gameObject == null)
+            {
+                Debug.LogError($"CanvasManager({name}) canvas.gameObject == nul", this);
+                return canvas;
+            }
+
             if (_instanceMatch.TryGetValue(canvas, out var canvasWrapper) == false)
             {
                 Debug.LogError($"CanvasManager({name}) not found canvasInstance:{canvas.gameObject.name}", this);
@@ -105,14 +174,7 @@ namespace UNKO.ManageUGUI
                 return canvas;
             }
 
-            if (canvasWrapper.wrapper != null)
-            {
-                canvasWrapper.wrapper.SetActive(true);
-                StartCoroutine(canvasWrapper.wrapper.OnShowCanvasCoroutine());
-                OnShowCanvas(canvasNameEnum, canvasWrapper.wrapper.CanvasInstance);
-            }
-
-            return canvasWrapper.wrapper.CanvasInstance;
+            return ProcessShow(canvasNameEnum, canvasWrapper.wrapper);
         }
 
         public void Hide(string canvasName)
@@ -124,6 +186,11 @@ namespace UNKO.ManageUGUI
             }
 
             Hide(canvasNameEnum);
+        }
+
+        public void Hide(params TCanvasName[] canvasNames)
+        {
+            canvasNames.ForEach(this.Hide);
         }
 
         public void Hide(TCanvasName canvasName)
@@ -146,6 +213,12 @@ namespace UNKO.ManageUGUI
         public void HideAll()
         {
             foreach (var canvasName in _canvasInstance.Keys)
+                Hide(canvasName);
+        }
+
+        public void HideAll(params TCanvasName[] except)
+        {
+            foreach (var canvasName in _canvasInstance.Keys.Where(canvas => except.Contains(canvas) == false))
                 Hide(canvasName);
         }
 
@@ -181,24 +254,9 @@ namespace UNKO.ManageUGUI
             {
                 _canvasInstance.Remove(canvasName);
 
-                canvasWrapperList.Foreach(canvas => canvas.Dispose());
+                CollectionExtension.ForEach(canvasWrapperList, canvas => canvas.Dispose());
                 canvasWrapperList.Clear();
             }
-        }
-
-        protected override void Awake()
-        {
-            base.Awake();
-
-            ICanvas[] canvasArray = GetComponentsInChildren<ICanvas>(true);
-            foreach (var canvas in canvasArray)
-            {
-                if (System.Enum.TryParse(canvas.name, out TCanvasName canvasName))
-                    AddCanvasInstance(canvasName, canvas);
-            }
-            Init(false);
-
-            IsReady = true;
         }
 
         protected virtual ICanvas OnRequireCanvasInstance(TCanvasName canvasName)
@@ -217,10 +275,14 @@ namespace UNKO.ManageUGUI
         protected CanvasWrapper GetCanvasWrapper(TCanvasName canvasName, System.Func<CanvasWrapper, bool> OnMatch = null)
         {
             if (_canvasInstance.TryGetValue(canvasName, out var canvasWrapperList) == false)
+            {
                 return null;
+            }
 
             if (OnMatch == null)
+            {
                 return canvasWrapperList.FirstOrDefault();
+            }
 
             return canvasWrapperList.FirstOrDefault(canvas => OnMatch(canvas));
         }
@@ -237,14 +299,21 @@ namespace UNKO.ManageUGUI
             return AddCanvasInstance(canvasName, canvasInstance);
         }
 
+        private ICanvas ProcessShow(TCanvasName canvasName, CanvasWrapper canvasWrapper)
+        {
+            if (canvasWrapper != null)
+            {
+                _commandQueue.RemoveAll(command => command.CanvasName.Equals(canvasName) && command.IsShow == false);
+                _commandQueue.Add(new Command(canvasName, canvasWrapper, true));
+            }
+
+            return canvasWrapper.CanvasInstance;
+        }
+
         private void ProcessHide(TCanvasName canvasName, CanvasWrapper canvasWrapper)
         {
-            canvasWrapper.SetStatus(CanvasStatus.HideAnimationPlaying);
-            OnHideCanvas(canvasName, canvasWrapper.CanvasInstance);
-            StartCoroutine(canvasWrapper.OnHideCanvasCoroutine, () =>
-            {
-                canvasWrapper.SetActive(false);
-            });
+            _commandQueue.RemoveAll(command => command.CanvasName.Equals(canvasName) && command.IsShow);
+            _commandQueue.Add(new Command(canvasName, canvasWrapper, false));
         }
 
         void StartCoroutine(System.Func<IEnumerator> coroutine, System.Action OnFinish)
